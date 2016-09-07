@@ -15,13 +15,14 @@ def v(dist, N):
     else: 
         print "Suma de probabilidades es 1"
         interval = []
+        #genero el intervalo
         for u in dist:
             if len(interval) != 0:
                 interval.append(u+interval[-1])
             else:
                 interval.append(u)
         x = np.random.random(N)
-        c = [0]*len(interval)
+        c = [0]*len(interval) # aciertos del intervalo
         for xn in x:
             for i in range(0,len(interval)):
                 if xn < interval[i] and xn > interval[i-1]:
@@ -30,7 +31,7 @@ def v(dist, N):
                 if i == 0 and xn < interval[0]:
                     #print "C "+str(i)+" +1 con el valor "+ str(xn)
                     c[i]+=1
-        
+        #imprimo mis aciertos
         for j in range(len(c)):
             percent = float(c[j])/N*100
             aster = "*" * int(percent/2)
