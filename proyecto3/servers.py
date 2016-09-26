@@ -21,7 +21,7 @@ C = []
 A = []
 D = []
 T = 2500
-servers = 10
+servers = 29
 lambdapp = 40
 a = 10
 
@@ -31,6 +31,7 @@ ta = exponencial(lambdapp)
 td = [inf]*servers
 ss = [0]*servers
 C = [0]*servers
+tx = [0]*servers
 
 
 while t < T or n >= 0:
@@ -50,7 +51,8 @@ while t < T or n >= 0:
             Y = exponencial(a)
             td[tempindex] = t + Y
             ss[tempindex] = Na
-            C[tempindex] += Y
+            tx[tempindex] += Y
+            C[tempindex] += 1
 
     elif min(td) < ta and min(td) < T:
         print "Case 2"
@@ -68,14 +70,30 @@ while t < T or n >= 0:
             Y = exponencial(a)
             td[tempindex] = t + Y
             ss[tempindex] = Na
-            C[tempindex] += Y
+            tx[tempindex] += Y
+            C[tempindex] += 1
 
     elif min(ta, min(td)) > T and n > 0:
         print "Case 3"
+        t = min(td)
+        n += -1
+        Nd += 1
+        D.append(t)
+        tempindex = findIndexOf(td, t)
+        if n > 0:
+            Na += 1
+            A.append(t)
+            Y = exponencial(a)
+            td[tempindex] = t + Y
+            ss[tempindex] = Na
+            tx[tempindex] += Y
+            C[tempindex] += 1
 
     elif n == 0:
         print "Case 4"
         break
 print sum(C)
 print C
+print sum(tx)
+print tx
 print n
