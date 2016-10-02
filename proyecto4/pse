@@ -1,0 +1,7 @@
+1. Guardar en memoria el estado en el que nos encontramos.
+2. En un principio tendremos 64 posibles, luego 62, 60, ... hasta que solamente tenga 2 soluciones.
+3. Verificar que pasos ya fueron realizados, y quitarlos de las posibles soluciones.
+4. Generar un numero random hasta que gane o pierda.
+5. Si gano, entonces a esa seleccion le sumo un 1.
+6. Si pierdo, entonces le sumo -1.
+7. Si empato, entonces le agrego 0.
