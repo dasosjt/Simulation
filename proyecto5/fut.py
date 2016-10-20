@@ -6,8 +6,8 @@ from math import *
 import fuzzy_logic as fl
 
 
-SCREEN_WIDTH = 410
-SCREEN_HEIGHT = 615
+SCREEN_WIDTH = 615
+SCREEN_HEIGHT = 410
 
 def get_first_angle((x, y)):
     angle = np.random.uniform(360)
@@ -55,13 +55,13 @@ class Bit(object):
 
 
 pygame.init()
-screen = pygame.display.set_mode((640, 400))
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 player = Bit('player.png')
-player.position(350,250)
+player.position(205,30)
 
 ball = Bit('ball.png')
-ball.position(50,250)
+ball.position(0,0)
 
 clock = pygame.time.Clock()
 

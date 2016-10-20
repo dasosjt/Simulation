@@ -2,23 +2,26 @@ import numpy as np
 from math import *
 
 def far(distance):
-    if distance < 740 and distance > 320:
-        return (2*distance - 740)/740
-    else:
-        return 0
+    if (distance < 740 and distance > 370):
+        print "far"
+        return (distance/370)-1
+    return 0
 
 def close(distance):
-    if distance > 0 and distance < 320:
-        return (-2*distance + 740)/740
-    else:
-        return 0
+    if (distance > 0 and distance < 370):
+        print "close"
+        return -(distance/370)+1
+    return 0
 
 def mid(distance):
-    if distance > 0 and distance < 320:
-        return (2*distance)/740
-    elif distance < 740:
-        return (-2*distance -1480)/740
+    if (distance > 0 and distance < 370):
+        print "mid1"
+        return distance/370
+    if (distance < 740 and distance > 370):
+        print "mid2"
+        return -(distance/370)+2
     return 0
+
 def north(angle):
     if angle > 20 and angle < 180:
         rads = deg2rad(angle)
@@ -26,26 +29,8 @@ def north(angle):
     else:
         return 0
 
-def south(angle):
-    if angle > 200 and angle < 340:
-        rads = deg2rad(angle)
-        return sen(rads)
-    else:
-        return 0
-
-def east(angle):
-    if angle < 70 or angle > 290:
-        rads = deg2rad(angle)
-        return cos(rads)
-    else:
-        return 0
-
-def west(angle):
-    if angle < 250 and angle > 110:
-        rads = deg2rad(angle)
-        return cos(rads)
-    else:
-        return 0
+def left(angle):
+    return 0
 
 def move_Horn(distance):
     #if close and mid, then move is low
@@ -61,4 +46,4 @@ def move_Horn(distance):
     print "top_of_mid_movement", top_of_mid_movement
     print "top_of_high_movement", top_of_high_movement
     print "Movement per time ", mpt
-    return mpt
+    return 5*mpt
