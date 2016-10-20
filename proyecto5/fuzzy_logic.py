@@ -17,8 +17,8 @@ def mid(distance):
     if distance > 0 and distance < 320:
         return (2*distance)/740
     elif distance < 740:
-        return (-2*distance -1440)/740
-
+        return (-2*distance -1480)/740
+    return 0
 def north(angle):
     if angle > 20 and angle < 180:
         rads = deg2rad(angle)

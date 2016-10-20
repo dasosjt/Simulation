@@ -65,7 +65,6 @@ ball.position(50,250)
 
 clock = pygame.time.Clock()
 
-first_line = get_first_angle(player.get_center_postion())
 
 print get_distance_between(player, ball)
 print get_angle_between(ball, player)
@@ -81,7 +80,7 @@ while True:
     screen.fill((255,255,255))
     player.draw(screen)
     ball.draw(screen)
-    pygame.draw.line(screen, (0, 0, 255), player.get_center_postion(), first_line)
+    pygame.draw.line(screen, (0, 0, 255), player.get_center_postion(), get_first_angle(player.get_center_postion()))
     pygame.display.update()
     player.x -= fl.move_Horn(get_distance_between(player, ball))
-    clock.tick(1)
+    clock.tick(40)
