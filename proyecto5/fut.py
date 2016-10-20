@@ -58,10 +58,10 @@ pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 player = Bit('player.png')
-player.position(205,30)
+player.position(405,30)
 
 ball = Bit('ball.png')
-ball.position(0,0)
+ball.position(20,30)
 
 clock = pygame.time.Clock()
 
