@@ -115,7 +115,7 @@ def monteCarloAI(board, occupied_position, n_simulation):
         x = np.random.randint(4)
         y = np.random.randint(4)
         z = np.random.randint(4)
-        c = 128
+        c = 64
 
         temp_pos = [x, y, z]
         temp_id = str(x)+"," + str(y) + "," + str(z)
@@ -160,6 +160,7 @@ def monteCarloAI(board, occupied_position, n_simulation):
         temp_occupied_position = []
 
     #best chance to win
+    print possible_position
     idmax =  max(possible_position, key=lambda k: possible_position[k])
     result = map(int, idmax.split(','))
     return result
@@ -182,7 +183,8 @@ while winner(board) == draw_token:
       z = int(raw_input("z: "))
   else:
       temp_board = copy.deepcopy(board)
-      [x, y, z] = monteCarloAI(temp_board, occupied_position, 10000)
+      temp_occupied_position = copy.deepcopy(occupied_position)
+      [x, y, z] = monteCarloAI(temp_board, temp_occupied_position, 20000)
       #print "came back from monteCarloAI"
 
   if board[x][y][z] == draw_token:
