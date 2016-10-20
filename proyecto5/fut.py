@@ -83,5 +83,5 @@ while True:
     ball.draw(screen)
     pygame.draw.line(screen, (0, 0, 255), player.get_center_postion(), first_line)
     pygame.display.update()
-
-    clock.tick(40)
+    player.x -= fl.move_Horn(get_distance_between(player, ball))
+    clock.tick(1)
