@@ -9,12 +9,11 @@ import fuzzy_logic as fl
 SCREEN_WIDTH = 615
 SCREEN_HEIGHT = 410
 
-def get_first_angle((x, y)):
-    angle = np.random.uniform(360)
-    print angle
-    x1 = 25*np.cos(np.deg2rad(angle))+x
-    y1 = -25*np.sin(np.deg2rad(angle))+y
-    return (x1, y1)
+
+def update_view_line((x, y), angle):
+    x1 = 25*np.cos(angle)+x
+    y1 = 25*np.sin(angle)+y
+    return ((x1, y1), angle)
 
 def get_distance_between(object1, object2):
     x = float(object1.get_center_postionx() - object2.get_center_postionx())
@@ -57,17 +56,20 @@ class Bit(object):
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
+xp = np.random.random_integers(SCREEN_WIDTH, size=(2,))
+yp = np.random.random_integers(SCREEN_HEIGHT, size=(2,))
+
 player = Bit('player.png')
-player.position(405,30)
+player.position(xp[0],yp[0])
 
 ball = Bit('ball.png')
-ball.position(20,30)
+ball.position(xp[1],yp[1])
 
 clock = pygame.time.Clock()
 
-
-print get_distance_between(player, ball)
-print get_angle_between(ball, player)
+diff_angle = 0
+angle = np.random.uniform(360)
+angle_between = 0
 
 while True:
     for event in pygame.event.get():
@@ -76,11 +78,19 @@ while True:
         elif event.type == KEYDOWN:
             if event.key == K_ESCAPE:
                 quit()
-
+    (view_line, angle) = update_view_line(player.get_center_postion(), angle)
+    angle_between = get_angle_between(ball, player)
+    diff_angle = angle - angle_between
+    print "Angle between ",angle_between
+    print "View Angle ", angle
+    print "Diff Angle ", diff_angle
     screen.fill((255,255,255))
     player.draw(screen)
     ball.draw(screen)
-    pygame.draw.line(screen, (0, 0, 255), player.get_center_postion(), get_first_angle(player.get_center_postion()))
+    pygame.draw.line(screen, (0, 0, 255), player.get_center_postion(), view_line)
     pygame.display.update()
-    player.x -= fl.move_Horn(get_distance_between(player, ball))
+    move = fl.move_Horn(get_distance_between(player, ball))
+    angle = fl.view_Horn(diff_angle)
+    player.x += move*np.cos(angle)
+    player.y += move*np.sin(angle)
     clock.tick(40)
