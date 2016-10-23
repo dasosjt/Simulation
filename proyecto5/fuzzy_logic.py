@@ -23,24 +23,29 @@ def mid(distance):
     return 0
 
 def right(angle):
-    if angle < 100:
-        return np.cos(np.deg2rad(angle))
+    if angle < 360 and angle > 180:
+        apt = 10*np.sin(np.deg2rad(angle))
+        print "\nRIGHT APT\n", apt
+        return apt
     return 0
 
 def left(angle):
-    if angle < 360 and angle > 260:
-        return np.cos(np.deg2rad(angle))
+    if angle > 0 and angle < 180:
+        apt = -10*np.sin(np.deg2rad(angle))
+        print "\nLEFT APT\n", apt
+        return apt
     return 0
 
 def lost(angle):
-    if 100 > angle and angle < 260:
-        return 0
+    if 90 < angle and angle < 270:
+        apt = 10*np.cos(np.deg2rad(angle))
+        print "\nLOST APT\n", apt
+        return apt
     else:
-        return np.sin(np.deg2rad(angle))
+        return 0
 
 def move_Horn(distance):
     #if close and mid, then move is low
-    print "Distance", distance
     top_of_low_movement = min(close(distance), mid(distance))
     #if mid, then move is mid
     top_of_mid_movement = mid(distance)
@@ -56,17 +61,14 @@ def move_Horn(distance):
 
 
 def view_Horn(angle):
-    #if close and mid, then move is low
-    print "Angle", angle
-    top_of_left = min(left(angle), lost(angle))
-    #if mid, then move is mid
-    top_of_right = min(right(angle), lost(angle))
-    #if mid, then move is mid
-    top_of_lost = min(lost(angle), min(right(angle), left(angle)))
-    #max movement will be 24 units per time, so there is 8 units per function
-    apt = (120*(top_of_left+top_of_right+top_of_lost))/360
-    #print "top_of_left", top_of_left
-    #print "top_of_right", top_of_right
-    print "top_of_lost", top_of_lost
-    print "Angle change per time ", apt
-    return 10*apt
+    angle %= 360
+    print "\nANGLE \n", angle
+    right_or_right = min(right(angle), left(angle))
+    lost_or_left = min(lost(angle), left(angle))
+    lost_or_right = min(lost(angle), right(angle))
+    apt = (120*(right_or_right+lost_or_left+lost_or_right))/360
+    if angle < 180:
+        apt = apt
+    else:
+        apt = -apt
+    return apt

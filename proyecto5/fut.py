@@ -11,8 +11,8 @@ SCREEN_HEIGHT = 410
 
 
 def update_view_line((x, y), angle):
-    x1 = 25*np.cos(angle)+x
-    y1 = 25*np.sin(angle)+y
+    x1 = 25*np.cos(np.deg2rad(angle))+x
+    y1 = 25*np.sin(np.deg2rad(-angle))+y
     return ((x1, y1), angle)
 
 def get_distance_between(object1, object2):
@@ -43,6 +43,15 @@ class Bit(object):
         self.x =  x-self.sprite.get_rect().centerx
         self.y =  y-self.sprite.get_rect().centery
 
+    def set_position(self, x, y):
+        dx = self.x+self.sprite.get_rect().centerx + x
+        dy = self.y+self.sprite.get_rect().centery + y
+        if 0 < dx and dx < SCREEN_WIDTH:
+            self.x += x
+        if 0 < dy and dy < SCREEN_HEIGHT:
+            self.y += y
+
+
     def get_center_postion(self):
         return (self.x+self.sprite.get_rect().centerx, self.y+self.sprite.get_rect().centery)
 
@@ -68,7 +77,7 @@ ball.position(xp[1],yp[1])
 clock = pygame.time.Clock()
 
 diff_angle = 0
-angle = np.random.uniform(360)
+angle = np.random.uniform(0, 360)
 angle_between = 0
 
 while True:
@@ -80,17 +89,19 @@ while True:
                 quit()
     (view_line, angle) = update_view_line(player.get_center_postion(), angle)
     angle_between = get_angle_between(ball, player)
-    diff_angle = angle - angle_between
-    print "Angle between ",angle_between
-    print "View Angle ", angle
-    print "Diff Angle ", diff_angle
+    diff_angle = angle-angle_between
+    #print "\nangle_between \n", angle_between
+    #print "\nview angle \n", angle
+    print "\ndiff angle \n", diff_angle
     screen.fill((255,255,255))
     player.draw(screen)
     ball.draw(screen)
     pygame.draw.line(screen, (0, 0, 255), player.get_center_postion(), view_line)
+    pygame.draw.line(screen, (255, 0, 0), player.get_center_postion(), ball.get_center_postion())
     pygame.display.update()
     move = fl.move_Horn(get_distance_between(player, ball))
-    angle = fl.view_Horn(diff_angle)
-    player.x += move*np.cos(angle)
-    player.y += move*np.sin(angle)
+    apt = fl.view_Horn(diff_angle)
+    angle += apt
+    angle %= 360
+    player.set_position(move*np.cos(np.deg2rad(angle)), move*np.sin(np.deg2rad(-angle)))
     clock.tick(40)
