@@ -25,21 +25,21 @@ def mid(distance):
 def right(angle):
     if angle < 360 and angle > 180:
         apt = 10*np.sin(np.deg2rad(angle))
-        print "\nRIGHT APT\n", apt
+        #print "\nRIGHT APT\n", apt
         return apt
     return 0
 
 def left(angle):
     if angle > 0 and angle < 180:
         apt = -10*np.sin(np.deg2rad(angle))
-        print "\nLEFT APT\n", apt
+        #print "\nLEFT APT\n", apt
         return apt
     return 0
 
 def lost(angle):
     if 90 < angle and angle < 270:
         apt = 10*np.cos(np.deg2rad(angle))
-        print "\nLOST APT\n", apt
+        #print "\nLOST APT\n", apt
         return apt
     else:
         return 0
@@ -62,7 +62,7 @@ def move_Horn(distance):
 
 def view_Horn(angle):
     angle %= 360
-    print "\nANGLE \n", angle
+    #print "\nANGLE \n", angle
     right_or_right = min(right(angle), left(angle))
     lost_or_left = min(lost(angle), left(angle))
     lost_or_right = min(lost(angle), right(angle))
