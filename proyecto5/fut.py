@@ -92,33 +92,40 @@ while True:
         elif event.type == KEYDOWN:
             if event.key == K_ESCAPE:
                 sys.exit()
+
     view_line = update_view_line(player.get_center_postion(), angle)
     angle_between = get_angle_between(ball, player)
     diff_angle = angle-angle_between
     distance_between = get_distance_between(player, ball)
-    screen.fill((255,255,255))
+    distance_between_ball_and_red = get_distance_between(ball, red)
 
     bg.draw(screen)
-    player.draw(screen)
-    ball.draw(screen)
-    red.draw(screen)
 
     pygame.draw.line(screen, (0, 0, 255), player.get_center_postion(), view_line)
     pygame.draw.line(screen, (255, 0, 0), player.get_center_postion(), ball.get_center_postion())
     pygame.draw.line(screen, (0, 255, 0), player.get_center_postion(), red.get_center_postion())
+
+    player.draw(screen)
+    ball.draw(screen)
+    red.draw(screen)
+
     move = fl.move_Horn(distance_between)
     apt = fl.view_Horn(diff_angle)
     angle += apt
     angle %= 360
+
     if distance_between > 25:
         player.set_position(move*np.cos(np.deg2rad(angle)), move*np.sin(np.deg2rad(-angle)))
     else:
-        angle_between_pandr = get_angle_between(red, player)
-        angle_dest = np.random.uniform(-70, 70)
-        f = np.random.uniform(0, 10)
-        print "F ", f
-        print " with angle destv ", angle_dest
-        ball.set_position(f*np.cos(np.deg2rad(angle_between_pandr+angle_dest)), f*np.sin(np.deg2rad(-angle_between_pandr+angle_dest)))
+        angle_between_player_and_red = get_angle_between(red, player)
+        angle_dest = np.random.uniform(-20, 20)
+        f = np.random.uniform(0, 50)
+        #print "F ", f
+        #print " with angle destv ", angle_dest
+        ball.set_position(f*np.cos(np.deg2rad(angle_between_player_and_red+angle_dest)), f*np.sin(np.deg2rad(-angle_between_player_and_red+angle_dest)))
+
+    if distance_between_ball_and_red < 20:
+        sys.exit()
 
     pygame.display.update()
     clock.tick(40)
