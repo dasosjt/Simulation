@@ -118,7 +118,7 @@ while True:
         player.set_position(move*np.cos(np.deg2rad(angle)), move*np.sin(np.deg2rad(-angle)))
     else:
         angle_between_player_and_red = get_angle_between(red, player)
-        angle_dest = np.random.uniform(-20, 20)
+        angle_dest = np.random.uniform(-70, 70)
         f = np.random.uniform(0, 50)
         #print "F ", f
         #print " with angle destv ", angle_dest
