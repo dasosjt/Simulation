@@ -1,15 +1,15 @@
 
 import numpy as np
 
-population_size = 240
+population_size = 120
 population_gen = 2
-max_value = 30
+max_value = 6
 
 population = np.random.uniform(0,max_value,(population_size,population_gen))
 
 N = 0
 
-while N < 200:
+while N < 100:
     fitness = np.zeros((population_size,3))
     max_fn = np.zeros((population_size,1))
     max_fn_index = np.zeros((population_size/3,1))
@@ -18,13 +18,13 @@ while N < 200:
         x1 = population[i][0]
         x2 = population[i][1]
 
-        if (x1 + 2*x2) <= 30:
+        if (3*x1 + 2*x2) <= 6:
             fitness[i][0] = 1
 
         if x1 >= 0 and x2 >= 0:
             fitness[i][1] = 1
 
-        max_fn[i] = 15*x1 + 30*x2 + 4*x1*x2 - 2*x1*x1 -4*x2*x2
+        max_fn[i] = 5*x1 -x1*x1 + 8*x2 - 2*x2*x2
 
         if max_fn[i] > 0:
             fitness[i][2] = 0.5
