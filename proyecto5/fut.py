@@ -1,5 +1,6 @@
 import pygame
 import sys
+import time
 import numpy as np
 from pygame.locals import *
 from math import *
@@ -79,6 +80,9 @@ red.position(SCREEN_WIDTH-30,SCREEN_HEIGHT/2-10)
 bg = Bit('bg.jpg')
 bg.position(SCREEN_WIDTH/2,SCREEN_HEIGHT/2)
 
+goal = Bit('goal.resized.jpg')
+goal.position(SCREEN_WIDTH/2,SCREEN_HEIGHT/2)
+
 clock = pygame.time.Clock()
 
 diff_angle = 0
@@ -125,7 +129,7 @@ while True:
         ball.set_position(f*np.cos(np.deg2rad(angle_between_player_and_red+angle_dest)), f*np.sin(np.deg2rad(-angle_between_player_and_red+angle_dest)))
 
     if distance_between_ball_and_red < 20:
-        sys.exit()
+        goal.draw(screen)
 
     pygame.display.update()
     clock.tick(40)
