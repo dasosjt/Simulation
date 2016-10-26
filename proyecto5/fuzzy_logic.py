@@ -63,12 +63,8 @@ def move_Horn(distance):
 def view_Horn(angle):
     angle %= 360
     #print "\nANGLE \n", angle
-    right_or_right = min(right(angle), left(angle))
-    lost_or_left = min(lost(angle), left(angle))
-    lost_or_right = min(lost(angle), right(angle))
-    apt = (120*(right_or_right+lost_or_left+lost_or_right))/360
-    if angle < 180:
-        apt = apt
-    else:
-        apt = -apt
+    right_and_right = min(right(angle), left(angle))
+    lost_and_left = min(lost(angle), left(angle))
+    lost_and_right = min(lost(angle), right(angle))
+    apt = (120*(right_and_right+lost_and_left+lost_and_right))/360
     return apt

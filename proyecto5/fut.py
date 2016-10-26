@@ -112,9 +112,15 @@ while True:
     player.draw(screen)
     ball.draw(screen)
     red.draw(screen)
-
+    copy_diff = diff_angle
+    copy_diff %= 360
     move = fl.move_Horn(distance_between)
     apt = fl.view_Horn(diff_angle)
+    if copy_diff < 180:
+        apt = apt
+    else:
+        apt = -apt
+
     angle += apt
     angle %= 360
 
