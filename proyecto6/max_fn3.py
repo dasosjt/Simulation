@@ -76,3 +76,16 @@ while N < 100:
 
     print "\nPopulation \n", population
     N += 1
+print "\nIndex of the max candidates.. \n", max_fn_index
+print "\nFitness \n", fitness
+print "\nPopulation \n", population
+c = 0
+found = False
+while not found:
+    max_candidate_index = int(max_fn_index[c])
+    max_candidate = population[max_candidate_index]
+    if fitness[max_candidate_index][0] == 1 and fitness[max_candidate_index][1] == 1 and fitness[max_candidate_index][2] == 1:
+        found = True
+    else:
+        c += 1
+print "\nThe best candidate is \n", max_candidate
