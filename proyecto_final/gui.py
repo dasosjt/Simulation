@@ -15,13 +15,13 @@ class Mosquitoe(pygame.sprite.Sprite):
         self.rect.x, self.rect.y  = position
         self.vector = vector
 
-	def update(self):
-		self.rect = self.new_pos(self.rect, self.vector)
+    def update(self):
+        self.rect = self.new_pos(self.rect, self.vector)
 
-	def new_pos(self, rect, vector):
-		(angle,z) = vector
-		(dx,dy) = (z*math.cos(angle), z*math.sin(angle))
-		return rect.move(dx,dy)
+    def new_pos(self, rect, vector):
+        (angle, z) = vector
+        (dx,dy) = (z*math.cos(angle), z*math.sin(angle))
+        return rect.move(dx,dy)
 
     def draw(self, surface):
         surface.blit(self.image, (self.rect.x, self.rect.y))
@@ -37,7 +37,7 @@ background = pygame.Surface(screen.get_size())
 background = background.convert()
 background.fill((255, 255, 255))
 
-m1 = Mosquitoe((0.3, 5), (30, 30))
+m1 = Mosquitoe((0.86, 5), (30, 30))
 
 "Init clock"
 clock = pygame.time.Clock()
@@ -51,6 +51,7 @@ while True:
                 sys.exit()
 
     screen.blit(background, (0, 0))
+    m1.update()
     m1.draw(screen)
 
     "60 fps"
