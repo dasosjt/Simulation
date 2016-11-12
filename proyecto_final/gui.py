@@ -19,6 +19,7 @@ class Mosquitoe(pygame.sprite.Sprite):
   self.rect = self.new_pos(self.rect, self.vector)
 
  def new_pos(self, rect, vector):
+  "Vector with the direction and how much to move"
   (angle, z) = vector
   (dx,dy) = (z*math.cos(angle), z*math.sin(angle))
   return rect.move(dx,dy)
