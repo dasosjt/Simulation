@@ -1,5 +1,6 @@
 import pygame, math, random, sys
 import numpy as np
+import random as r
 from pygame.locals import *
 
 class Mosquitoe(pygame.sprite.Sprite):
@@ -30,7 +31,13 @@ class Mosquitoe(pygame.sprite.Sprite):
   (angle, z) = vector
   #print np.rad2deg(angle)
   (dx,dy) = (z*np.cos(angle), -z*np.sin(angle))
+ 
+  if (dx<=0 or dx>=640):
+    return rect.move(dx,dy)
+  if (dy<=0 or dy>=480):
+    return rect.move(dx,dy)
   return rect.move(dx,dy)
+
 
  def draw(self, surface):
   surface.blit(self.image, (self.rect.x, self.rect.y))
@@ -39,7 +46,7 @@ class Mosquitoe(pygame.sprite.Sprite):
   dx = float(self.rect.centerx - object_to.rect.centerx)
   dy = float(self.rect.centery - object_to.rect.centery)
   rads = math.atan2(-dy,dx)
-  print np.rad2deg(rads)
+  #print np.rad2deg(rads)
   return rads
 
  def distance_between(self, object_to):
@@ -79,9 +86,11 @@ background = pygame.Surface(screen.get_size())
 background = background.convert()
 background.fill((255, 255, 255))
 
-m1 = Mosquitoe((0, 5), (0, 250))
-m2 = Mosquitoe((0.5*np.pi, 0), (250, 250))
+moscos = []
 
+for i in range(30):
+    moscos.append(Mosquitoe((r.randint(1,360), r.randint(2,3)), (r.randint(0,639), r.randint(0,476))))
+    
 "Init clock"
 clock = pygame.time.Clock()
 
@@ -94,11 +103,12 @@ while True:
     sys.exit()
 
  screen.blit(background, (0, 0))
- m1.update()
- m1.draw(screen)
- m2.update()
- m2.draw(screen)
- m2.angle_between(m1)
+ 
+ for mosco in moscos:
+     mosco.update()
+     mosco.draw(screen)
+
+ #moscos[1].angle_between(moscos[0])
 
  "60 fps"
  clock.tick(60)
