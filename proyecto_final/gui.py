@@ -3,6 +3,9 @@ import numpy as np
 import random as r
 from pygame.locals import *
 
+WIDTH = 640
+HEIGHT = 480
+
 class Mosquitoe(pygame.sprite.Sprite):
  "Returns: mosquitoe object"
  "Function: update, new_pos"
@@ -31,13 +34,12 @@ class Mosquitoe(pygame.sprite.Sprite):
   (angle, z) = vector
   #print np.rad2deg(angle)
   (dx,dy) = (z*np.cos(angle), -z*np.sin(angle))
- 
-  if (dx<=0 or dx>=640):
+  #print (dx, dy)
+  if (rect.centerx>0 and rect.centerx<WIDTH) and (rect.centery>0 and rect.centery<HEIGHT):
+    #print "Im a good guy "
     return rect.move(dx,dy)
-  if (dy<=0 or dy>=480):
-    return rect.move(dx,dy)
-  return rect.move(dx,dy)
-
+  else:
+    return rect.move(0,0)
 
  def draw(self, surface):
   surface.blit(self.image, (self.rect.x, self.rect.y))
@@ -78,7 +80,7 @@ class Mosquitoe(pygame.sprite.Sprite):
 
 "Screen"
 pygame.init()
-screen = pygame.display.set_mode((640, 480))
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('GANN')
 
 "Fill background"
@@ -90,7 +92,7 @@ moscos = []
 
 for i in range(30):
     moscos.append(Mosquitoe((r.randint(1,360), r.randint(2,3)), (r.randint(0,639), r.randint(0,476))))
-    
+
 "Init clock"
 clock = pygame.time.Clock()
 
@@ -103,7 +105,7 @@ while True:
     sys.exit()
 
  screen.blit(background, (0, 0))
- 
+
  for mosco in moscos:
      mosco.update()
      mosco.draw(screen)
