@@ -36,15 +36,10 @@ class Mosquitoe(pygame.sprite.Sprite):
   self.gann = gann.reshape((NODES, NODES))
   #print self.gann
   "input layer"
-  self.input0 = 0
-  self.input1 = 0
-  self.input2 = 0
-  self.input3 = 0
-  self.input4 = 0
+  self.input = np.zeros(INPUT)
 
  def update(self):
   "GANN operations"
-  temp_input = np.random.randint(-100,100, INPUT)
   temp_sigmoid = np.zeros(SIGMOID)
   temp_output = np.zeros(OUTPUT)
   "GANN input for sigmoid layer"
@@ -54,7 +49,7 @@ class Mosquitoe(pygame.sprite.Sprite):
     #print temp_w
     #print "This are the respective inputs to sigmoid node number ", i
     #print temp_input
-    temp_sigmoid[i] = sigmoid(np.sum(np.multiply(temp_w, temp_input)))
+    temp_sigmoid[i] = sigmoid(np.sum(np.multiply(temp_w, self.input)))
     #print "This are the temp sigmoid output "
     #print temp_sigmoid
   "GANN input for output layer"
@@ -99,26 +94,22 @@ class Mosquitoe(pygame.sprite.Sprite):
 
  def distance_between_food(self, list_of_food):
   "Reset Input Layer"
-  self.input0 = MAX_DISTANCE
-  self.input1 = MAX_DISTANCE
-  self.input2 = MAX_DISTANCE
-  self.input3 = MAX_DISTANCE
-  self.input4 = MAX_DISTANCE
+  self.input.fill(MAX_DISTANCE) 
   for f in list_of_food:
    rads = self.angle_between(f)
    temp_distance = self.distance_between(f)
    print np.rad2deg(rads)
    print temp_distance
    if np.rad2deg(rads) < 15 and np.rad2deg(rads) > -15 and self.input2 > temp_distance:
-    self.input2 = self.distance_between(f)
+    self.input[0] = self.distance_between(f)
    elif np.rad2deg(rads) < 35 and np.rad2deg(rads) > 15 and self.input1 > temp_distance:
-    self.input1 = self.distance_between(f)
+    self.input[1] = self.distance_between(f)
    elif np.rad2deg(rads) < 45 and np.rad2deg(rads) > 35 and self.input0 > temp_distance:
-    self.input0 = self.distance_between(f)
+    self.input[2] = self.distance_between(f)
    elif np.rad2deg(rads) < -15 and np.rad2deg(rads) > -35 and self.input3 > temp_distance:
-    self.input3 = self.distance_between(f)
+    self.input[3] = self.distance_between(f)
    elif np.rad2deg(rads) < -35 and np.rad2deg(rads) > -45 and self.input4 > temp_distance:
-    self.input4 = self.distance_between(f)
+    self.input[4] = self.distance_between(f)
 
 "Screen"
 pygame.init()
