@@ -5,14 +5,26 @@ from pygame.locals import *
 
 WIDTH = 640
 HEIGHT = 480
-MAX_DISTANCE = math.sqrt(math.pow(WIDTH) + math.pow(HEIGHT))
+MAX_DISTANCE = np.sqrt(np.power(WIDTH, 2) + np.power(HEIGHT, 2))
+NODES = 6
+N_NUMBER_M = 20
+INPUT = 2
+OUTPUT = 2
+SIGMOID = NODES - INPUT - OUTPUT
+
+population = np.random.randint(-100,100,(N_NUMBER_M, NODES*NODES))
+population = np.multiply(population, 0.01)
+
+def sigmoid(number):
+  result = 1/(1 + np.exp(-number))
+  return result
 
 class Mosquitoe(pygame.sprite.Sprite):
  "Returns: mosquitoe object"
  "Function: update, new_pos"
  "Atributes: vector"
 
- def __init__(self, vector, position):
+ def __init__(self, vector, position, gann):
   pygame.sprite.Sprite.__init__(self)
   self.image = pygame.Surface([10, 10])
   self.image = self.image.convert()
@@ -20,6 +32,9 @@ class Mosquitoe(pygame.sprite.Sprite):
   self.rect = self.image.get_rect()
   self.rect.x, self.rect.y  = position
   self.vector = vector
+  "GANN"
+  self.gann = gann.reshape((NODES, NODES))
+  #print self.gann
   "input layer"
   self.input0 = 0
   self.input1 = 0
@@ -28,6 +43,30 @@ class Mosquitoe(pygame.sprite.Sprite):
   self.input4 = 0
 
  def update(self):
+  "GANN operations"
+  temp_input = np.random.randint(-100,100, INPUT)
+  temp_sigmoid = np.zeros(SIGMOID)
+  temp_output = np.zeros(OUTPUT)
+  "GANN input for sigmoid layer"
+  for i in range(SIGMOID):
+    temp_w = self.gann[0:INPUT, i + INPUT ]
+    #print "This are the weights to sigmoid node number ", i
+    #print temp_w
+    #print "This are the respective inputs to sigmoid node number ", i
+    #print temp_input
+    temp_sigmoid[i] = sigmoid(np.sum(np.multiply(temp_w, temp_input)))
+    #print "This are the temp sigmoid output "
+    #print temp_sigmoid
+  "GANN input for output layer"
+  for i in range(OUTPUT):
+    temp_w = self.gann[INPUT:SIGMOID+INPUT, i + SIGMOID + INPUT]
+    #print "This are the weights to output node number ", i
+    #print temp_w
+    #print "This are the respective inputs to output node number ", i
+    #print temp_sigmoid
+    temp_output[i] = sigmoid(np.sum(np.multiply(temp_w, temp_output)))
+  (angle, z) = self.vector
+  self.vector = (angle + temp_output[0], z +temp_output[1])
   self.rect = self.new_pos(self.rect, self.vector)
 
  def new_pos(self, rect, vector):
@@ -93,8 +132,8 @@ background.fill((255, 255, 255))
 
 moscos = []
 
-for i in range(30):
-    moscos.append(Mosquitoe((r.randint(1,360), r.randint(2,3)), (r.randint(0,639), r.randint(0,476))))
+for i in range(N_NUMBER_M):
+    moscos.append(Mosquitoe((r.randint(1,360), r.randint(2,3)), (r.randint(0,639), r.randint(0,476)), population[i]))
 
 "Init clock"
 clock = pygame.time.Clock()
