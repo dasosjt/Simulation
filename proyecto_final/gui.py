@@ -6,9 +6,9 @@ from pygame.locals import *
 WIDTH = 640
 HEIGHT = 480
 MAX_DISTANCE = np.sqrt(np.power(WIDTH, 2) + np.power(HEIGHT, 2))
-NODES = 6
-N_NUMBER_M = 20
-INPUT = 2
+NODES = 12
+N_NUMBER_M = 1
+INPUT = 6
 OUTPUT = 2
 SIGMOID = NODES - INPUT - OUTPUT
 
@@ -40,28 +40,30 @@ class Mosquitoe(pygame.sprite.Sprite):
 
  def update(self):
   "GANN operations"
+  self.input = np.random.randint(0,MAX_DISTANCE,INPUT)
   temp_sigmoid = np.zeros(SIGMOID)
   temp_output = np.zeros(OUTPUT)
   "GANN input for sigmoid layer"
   for i in range(SIGMOID):
     temp_w = self.gann[0:INPUT, i + INPUT ]
-    #print "This are the weights to sigmoid node number ", i
-    #print temp_w
-    #print "This are the respective inputs to sigmoid node number ", i
-    #print temp_input
+    print "This are the weights to sigmoid node number ", i
+    print temp_w
+    print "This are the respective inputs to sigmoid node number ", i
+    print self.input
     temp_sigmoid[i] = sigmoid(np.sum(np.multiply(temp_w, self.input)))
-    #print "This are the temp sigmoid output "
-    #print temp_sigmoid
+    print "This are the temp sigmoid output "
+    print temp_sigmoid
   "GANN input for output layer"
   for i in range(OUTPUT):
     temp_w = self.gann[INPUT:SIGMOID+INPUT, i + SIGMOID + INPUT]
-    #print "This are the weights to output node number ", i
-    #print temp_w
-    #print "This are the respective inputs to output node number ", i
-    #print temp_sigmoid
-    temp_output[i] = sigmoid(np.sum(np.multiply(temp_w, temp_output)))
+    print "This are the weights to output node number ", i
+    print temp_w
+    print "This are the respective inputs to output node number ", i
+    print temp_sigmoid
+    temp_output[i] = sigmoid(np.sum(np.multiply(temp_w, temp_sigmoid)))
+  print temp_output
   (angle, z) = self.vector
-  self.vector = (angle + temp_output[0], z +temp_output[1])
+  self.vector = (angle + temp_output[0], z + temp_output[1])
   self.rect = self.new_pos(self.rect, self.vector)
 
  def new_pos(self, rect, vector):
@@ -74,6 +76,30 @@ class Mosquitoe(pygame.sprite.Sprite):
     #print "Im a good guy "
     return rect.move(dx,dy)
   else:
+    if(rect.centery < 0):
+        self.rect.y = HEIGHT
+        if(rect.centerx < 0):
+            self.rect.x = WIDTH
+        elif(rect.centerx > WIDTH):
+            self.rect.x = 0
+    if(rect.centery > HEIGHT):
+        self.rect.y = 0
+        if(rect.centerx < 0):
+            self.rect.x = WIDTH
+        elif(rect.centerx > WIDTH):
+            self.rect.x = 0
+    if(rect.centerx < 0):
+        self.rect.x = WIDTH
+        if(rect.centery < 0):
+            self.rect.y = HEIGHT
+        elif(rect.centery > HEIGHT):
+            self.rect.y = 0
+    if(rect.centerx > WIDTH):
+        self.rect.x = 0
+        if(rect.centery < 0):
+            self.rect.y = HEIGHT
+        elif(rect.centery > HEIGHT):
+            self.rect.y = 0
     return rect.move(0,0)
 
  def draw(self, surface):
@@ -94,7 +120,7 @@ class Mosquitoe(pygame.sprite.Sprite):
 
  def distance_between_food(self, list_of_food):
   "Reset Input Layer"
-  self.input.fill(MAX_DISTANCE) 
+  self.input.fill(MAX_DISTANCE)
   for f in list_of_food:
    rads = self.angle_between(f)
    temp_distance = self.distance_between(f)
