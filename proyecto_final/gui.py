@@ -166,8 +166,8 @@ for i in range(N_NUMBER_M):
     moscos.append(Mosquitoe((r.randint(0,1), r.randint(0,1)), (r.randint(0,WIDTH-1), r.randint(0,HEIGHT-1)), population[i]))
 
 #comida = Food((619, 459))
-posx = r.randint(1,619)
-posy =  r.randint(1,459)
+posx = r.randint(1,WIDTH-1)
+posy =  r.randint(1,HEIGHT-1)
 
 comida = Food((posx,posy))
 comidas.append(comida)
@@ -192,8 +192,8 @@ while True:
 
  for mosco in moscos:
   if cambiar == True:
-    posx = r.randint(1,619)
-    posy =  r.randint(1,459)
+    posx = r.randint(1,WIDTH-1)
+    posy =  r.randint(1,HEIGHT-1)
     comida = Food((posx,posy))
     comidas.append(comida)
     cambiar = False
