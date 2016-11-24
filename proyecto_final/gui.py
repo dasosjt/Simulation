@@ -6,7 +6,7 @@ from pygame.locals import *
 WIDTH = 640
 HEIGHT = 480
 MAX_DISTANCE = np.sqrt(np.power(WIDTH, 2) + np.power(HEIGHT, 2))
-NODES = 16
+NODES = 22
 INPUT = 2
 OUTPUT = 4
 SIGMOID = NODES - INPUT - OUTPUT
@@ -166,6 +166,8 @@ background.fill((255, 255, 255))
 moscos = []
 comidas =[]
 
+generation = 0
+
 for i in range(N_NUMBER_M):
     moscos.append(Mosquitoe((r.randint(0,1), r.randint(0,1)), (r.randint(0,WIDTH-1), r.randint(0,HEIGHT-1)), population[i]))
 
@@ -200,7 +202,13 @@ while True:
     mosco.fitness+=1
    comida.draw(screen)
 
+ myfont = pygame.font.SysFont("calibri", 25)
+ label = myfont.render("GENERATION : "+str(generation), 24, (0,0,0))
+ screen.blit(label, (WIDTH/2 - 75, 40))
+
  "60 fps"
  clock.tick(CLK)
  pygame.display.update()
  t += 1
+
+generation += 1
