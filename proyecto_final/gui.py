@@ -11,6 +11,8 @@ INPUT = 2
 OUTPUT = 4
 SIGMOID = NODES - INPUT - OUTPUT
 
+INFINITE = float("inf")
+
 DP = 10
 
 N_NUMBER_M = 100
@@ -40,7 +42,7 @@ class Food(pygame.sprite.Sprite):
 
  def __init__(self, position):
   pygame.sprite.Sprite.__init__(self)
-  self.image = pygame.Surface([20, 20])
+  self.image = pygame.Surface([10, 10])
   self.image = self.image.convert()
   self.image.fill((255,0,0))
   self.rect = self.image.get_rect()
@@ -72,7 +74,10 @@ class Mosquitoe(pygame.sprite.Sprite):
  def update(self):
   "GANN operations"
   #self.input = np.random.randint(0,MAX_DISTANCE,INPUT)
-  self.input[0] = 1/self.input[0]
+  if(self.input[0] == 0):
+      self.input[0] = INFINITE
+  else:
+      self.input[0] = 1/self.input[0]
   temp_sigmoid = np.zeros(SIGMOID)
   temp_output = np.zeros(OUTPUT)
   "GANN input for sigmoid layer"
@@ -104,10 +109,7 @@ class Mosquitoe(pygame.sprite.Sprite):
   #print np.rad2deg(angle)
   (dx,dy) = (z*np.cos(angle), -z*np.sin(angle))
   #print (dx, dy)
-  if (rect.centerx>0 and rect.centerx<WIDTH) and (rect.centery>0 and rect.centery<HEIGHT):
-    #print "Im a good guy "
-    return rect.move(dx,dy)
-  else:
+  if not((rect.centerx>0 and rect.centerx<WIDTH) and (rect.centery>0 and rect.centery<HEIGHT)):
     if (rect.centerx < 0):
         #print "-x"
         rect.centerx = WIDTH-1
@@ -120,7 +122,7 @@ class Mosquitoe(pygame.sprite.Sprite):
     elif(rect.centery > HEIGHT):
         #print "++y"
         rect.centery = 1
-    return rect.move(dx,dy)
+  return rect.move(dx,dy)
 
  def draw(self, surface):
   surface.blit(self.image, (self.rect.x, self.rect.y))
@@ -165,19 +167,13 @@ comidas =[]
 for i in range(N_NUMBER_M):
     moscos.append(Mosquitoe((r.randint(0,1), r.randint(0,1)), (r.randint(0,WIDTH-1), r.randint(0,HEIGHT-1)), population[i]))
 
-#comida = Food((619, 459))
-posx = r.randint(1,WIDTH-1)
-posy =  r.randint(1,HEIGHT-1)
+for i in range(5):
+    comidas.append(Food((r.randint(1,WIDTH-1), r.randint(1,HEIGHT-1))))
 
-comida = Food((posx,posy))
-comidas.append(comida)
-cambiar = False
 "Init clock"
 clock = pygame.time.Clock()
-t = 0
+t = 1
 while True:
- #print str(t)
- t+=1
  if(t==1000):
    terminar(moscos)
    break
@@ -191,32 +187,20 @@ while True:
  screen.blit(background, (0, 0))
 
  for mosco in moscos:
-  if cambiar == True:
-    posx = r.randint(1,WIDTH-1)
-    posy =  r.randint(1,HEIGHT-1)
-    comida = Food((posx,posy))
-    comidas.append(comida)
-    cambiar = False
-
   mosco.distance_between_food(comidas)
   mosco.update()
   mosco.draw(screen)
+
+  for comida in comidas:
+   if(pygame.sprite.collide_rect(mosco, comida)):
+    comida.rect.x = r.randint(1,WIDTH-1)
+    comida.rect.y = r.randint(1,HEIGHT-1)
+    mosco.fitness+=1
+
+ for comida in comidas:
   comida.draw(screen)
-
-  if mosco.rect.x>=posx and mosco.rect.x <= posx+20:
-    if mosco.rect.y>=posy and mosco.rect.y <= posy+20:
-      #print "cambiar"
-      cambiar = True
-      mosco.fitness+=1
-      #print str(mosco.fitness)
-
-  if mosco.rect.centerx>=posx and mosco.rect.centerx<= posx+20:
-    if mosco.rect.centery>=posy and mosco.rect.centery<= posy+20:
-      #print "cambiar"
-      cambiar = True
-      mosco.fitness+=1
-      #print str(mosco.fitness)
 
  "60 fps"
  clock.tick(CLK)
  pygame.display.update()
+ t += 1
