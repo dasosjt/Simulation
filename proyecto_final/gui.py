@@ -11,28 +11,59 @@ INPUT = 2
 OUTPUT = 4
 SIGMOID = NODES - INPUT - OUTPUT
 
+Generacion = 0
+idMayor = 0
+
 INFINITE = float("inf")
 
 DP = 10
 
 N_NUMBER_M = 100
-N_NUMBER_C = 5
+N_NUMBER_C = 10
 
-CLK = 30
+CLK = 500
 
 population = np.random.randint(-100,100,(N_NUMBER_M, NODES*NODES))
 population = np.multiply(population, 0.01)
 
 def terminar(moscos):
   mayor = 0
-  idMayor = 0
   for mosco in moscos:
-    print "El fitness del mosco " + str(moscos.index(mosco)) + " es de " + str(mosco.fitness)
+    #print "El fitness del mosco " + str(moscos.index(mosco)) + " es de " + str(mosco.fitness)
     if mosco.fitness > mayor:
       mayor = mosco.fitness
       idMayor = moscos.index(mosco)
   print "El fitness mayor es " + str(mayor) + " del mosco " + str(idMayor)
 
+def nuevaPoblacion(moscos):
+
+  mayor = 0
+  mean = 0
+  for mosco in moscos:
+    mean +=mosco.fitness
+    if mosco.fitness > mayor:
+      mayor = mosco.fitness
+      idMayor = moscos.index(mosco)
+  mean = mean/100.
+  
+  buenosMoscos = []
+  for mosco in moscos:
+    if mosco.fitness > mean:
+      buenosMoscos.append(mosco)
+  print len(buenosMoscos)
+
+  
+  
+      
+  moscos = []
+  
+  for i in range(N_NUMBER_M):
+    a = r.randint(0,len(buenosMoscos)-1)  
+    temp = buenosMoscos[a]
+    moscos.append(Mosquitoe((r.randint(0,1), r.randint(0,1)), (r.randint(0,WIDTH-1), r.randint(0,HEIGHT-1)), temp.gann))
+    
+  return moscos
+    
 def sigmoid(number):
   result = 1/(1 + np.exp(-number))
   return result
@@ -127,7 +158,7 @@ class Mosquitoe(pygame.sprite.Sprite):
 
  def draw(self, surface):
   #surface.blit(self.image, (self.rect.x, self.rect.y))
-  pygame.draw.circle(surface, (20,150,20), (self.rect.x, self.rect.y), 3)
+  pygame.draw.circle(surface, (20,150,20), (self.rect.x, self.rect.y), 3*self.fitness)
 
  def angle_between(self, object_to):
   dx = float(self.rect.centerx - object_to.rect.centerx)
@@ -153,62 +184,83 @@ class Mosquitoe(pygame.sprite.Sprite):
      self.input[0] = temp_distance
      self.input[1] = rads
 
-"Screen"
-pygame.init()
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption('GANN')
+ def reset_fitness(self):
+  self.fitness = 0
 
-"Fill background"
-background = pygame.Surface(screen.get_size())
-background = background.convert()
-background.fill((255, 255, 255))
+ def reset_pos(self):
+  self.rect.x = r.randint(0,WIDTH-1)
+  self.rect.y = r.randint(0,HEIGHT-1)
 
-moscos = []
-comidas =[]
+Generacion = 0
 
-generation = 0
+while Generacion < 11:
+ 
+ "Screen"
+ pygame.init()
+ screen = pygame.display.set_mode((WIDTH, HEIGHT))
+ pygame.display.set_caption('GANN')
 
-for i in range(N_NUMBER_M):
-    moscos.append(Mosquitoe((r.randint(0,1), r.randint(0,1)), (r.randint(0,WIDTH-1), r.randint(0,HEIGHT-1)), population[i]))
+ "Fill background"
+ background = pygame.Surface(screen.get_size())
+ background = background.convert()
+ background.fill((255, 255, 255))
 
-for i in range(N_NUMBER_C):
-    comidas.append(Food((r.randint(1,WIDTH-1), r.randint(1,HEIGHT-1))))
+ if Generacion == 0:
+  moscos = []
+  comidas = []
 
-"Init clock"
-clock = pygame.time.Clock()
-t = 1
-while True:
- if(t==1000):
-   terminar(moscos)
-   break
- for event in pygame.event.get():
-  if event.type == pygame.QUIT:
-   sys.exit()
-  elif event.type == KEYDOWN:
-   if event.key == K_ESCAPE:
+  for i in range(N_NUMBER_M):
+     moscos.append(Mosquitoe((r.randint(0,1), r.randint(0,1)), (r.randint(0,WIDTH-1), r.randint(0,HEIGHT-1)), population[i]))
+
+  for i in range(N_NUMBER_C):
+     comidas.append(Food((r.randint(1,WIDTH-1), r.randint(1,HEIGHT-1))))
+    
+ else:
+  moscos = nuevaPoblacion(moscos)
+  comidas = []
+
+  for i in range(N_NUMBER_C):
+     comidas.append(Food((r.randint(1,WIDTH-1), r.randint(1,HEIGHT-1))))
+
+
+ "Init clock"
+ clock = pygame.time.Clock()
+ t = 1
+ while True:
+  if(t==1000):
+    Generacion += 1
+    terminar(moscos)
+    break
+  for event in pygame.event.get():
+   if event.type == pygame.QUIT:
     sys.exit()
+   elif event.type == KEYDOWN:
+    if event.key == K_ESCAPE:
+     sys.exit()
 
- screen.blit(background, (0, 0))
+  screen.blit(background, (0, 0))
 
- for mosco in moscos:
-  mosco.distance_between_food(comidas)
-  mosco.update()
-  mosco.draw(screen)
+  for mosco in moscos:
+   mosco.distance_between_food(comidas)
+   mosco.update()
+   mosco.draw(screen)
 
-  for comida in comidas:
-   if(pygame.sprite.collide_rect(mosco, comida)):
-    comida.rect.x = r.randint(1,WIDTH-1)
-    comida.rect.y = r.randint(1,HEIGHT-1)
-    mosco.fitness+=1
-   comida.draw(screen)
+   for comida in comidas:
+    if(pygame.sprite.collide_rect(mosco, comida)):
+     comida.rect.x = r.randint(1,WIDTH-1)
+     comida.rect.y = r.randint(1,HEIGHT-1)
+     mosco.fitness+=1
+    comida.draw(screen)
 
- myfont = pygame.font.SysFont("calibri", 25)
- label = myfont.render("GENERATION : "+str(generation), 24, (0,0,0))
- screen.blit(label, (WIDTH/2 - 75, 40))
+  myfont = pygame.font.SysFont("calibri", 25)
+  label = myfont.render("GENERATION : "+str(Generacion+1), 24, (0,0,0))
+  label2 = myfont.render("t : "+str(t), 24, (0,0,0))
+  screen.blit(label, (WIDTH/2 - 75, 40))
+  screen.blit(label2, (10, 20))
+  
+  "60 fps"
+  clock.tick(CLK)
+  pygame.display.update()
+  t += 1
 
- "60 fps"
- clock.tick(CLK)
- pygame.display.update()
- t += 1
-
-generation += 1
+ 
