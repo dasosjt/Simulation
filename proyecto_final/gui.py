@@ -16,6 +16,7 @@ INFINITE = float("inf")
 DP = 10
 
 N_NUMBER_M = 100
+N_NUMBER_C = 5
 
 CLK = 30
 
@@ -58,7 +59,7 @@ class Mosquitoe(pygame.sprite.Sprite):
 
  def __init__(self, vector, position, gann):
   pygame.sprite.Sprite.__init__(self)
-  self.image = pygame.Surface([10, 10])
+  self.image = pygame.Surface((10, 10))
   self.image = self.image.convert()
   self.image.fill((20,20,20))
   self.rect = self.image.get_rect()
@@ -125,7 +126,8 @@ class Mosquitoe(pygame.sprite.Sprite):
   return rect.move(dx,dy)
 
  def draw(self, surface):
-  surface.blit(self.image, (self.rect.x, self.rect.y))
+  #surface.blit(self.image, (self.rect.x, self.rect.y))
+  pygame.draw.circle(surface, (20,150,20), (self.rect.x, self.rect.y), 3)
 
  def angle_between(self, object_to):
   dx = float(self.rect.centerx - object_to.rect.centerx)
@@ -167,7 +169,7 @@ comidas =[]
 for i in range(N_NUMBER_M):
     moscos.append(Mosquitoe((r.randint(0,1), r.randint(0,1)), (r.randint(0,WIDTH-1), r.randint(0,HEIGHT-1)), population[i]))
 
-for i in range(5):
+for i in range(N_NUMBER_C):
     comidas.append(Food((r.randint(1,WIDTH-1), r.randint(1,HEIGHT-1))))
 
 "Init clock"
@@ -196,9 +198,7 @@ while True:
     comida.rect.x = r.randint(1,WIDTH-1)
     comida.rect.y = r.randint(1,HEIGHT-1)
     mosco.fitness+=1
-
- for comida in comidas:
-  comida.draw(screen)
+   comida.draw(screen)
 
  "60 fps"
  clock.tick(CLK)
