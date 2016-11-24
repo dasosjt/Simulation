@@ -6,14 +6,16 @@ from pygame.locals import *
 WIDTH = 640
 HEIGHT = 480
 MAX_DISTANCE = np.sqrt(np.power(WIDTH, 2) + np.power(HEIGHT, 2))
-NODES = 24
-INPUT = 4
+NODES = 16
+INPUT = 2
 OUTPUT = 4
 SIGMOID = NODES - INPUT - OUTPUT
 
+DP = 10
+
 N_NUMBER_M = 100
 
-CLK = 60
+CLK = 30
 
 population = np.random.randint(-100,100,(N_NUMBER_M, NODES*NODES))
 population = np.multiply(population, 0.01)
@@ -70,6 +72,7 @@ class Mosquitoe(pygame.sprite.Sprite):
  def update(self):
   "GANN operations"
   #self.input = np.random.randint(0,MAX_DISTANCE,INPUT)
+  self.input[0] = 1/self.input[0]
   temp_sigmoid = np.zeros(SIGMOID)
   temp_output = np.zeros(OUTPUT)
   "GANN input for sigmoid layer"
@@ -92,7 +95,7 @@ class Mosquitoe(pygame.sprite.Sprite):
     temp_output[i] = sigmoid(np.sum(np.multiply(temp_w, temp_sigmoid)))
   #print temp_output
   (angle, z) = self.vector
-  self.vector = (angle + temp_output[0] - temp_output[1], z + temp_output[2] - temp_output[3])
+  self.vector = ((temp_output[0] - temp_output[1])*2*np.pi, (temp_output[2] - temp_output[3])*DP)
   self.rect = self.new_pos(self.rect, self.vector)
 
  def new_pos(self, rect, vector):
@@ -105,7 +108,19 @@ class Mosquitoe(pygame.sprite.Sprite):
     #print "Im a good guy "
     return rect.move(dx,dy)
   else:
-    return rect.move(0,0)
+    if (rect.centerx < 0):
+        #print "-x"
+        rect.centerx = WIDTH-1
+    elif(rect.centerx > WIDTH):
+        #print "++x"
+        rect.centerx = 1
+    elif(rect.centery < 0):
+        #print "-y"
+        rect.centery = HEIGHT-1
+    elif(rect.centery > HEIGHT):
+        #print "++y"
+        rect.centery = 1
+    return rect.move(dx,dy)
 
  def draw(self, surface):
   surface.blit(self.image, (self.rect.x, self.rect.y))
@@ -114,7 +129,8 @@ class Mosquitoe(pygame.sprite.Sprite):
   dx = float(self.rect.centerx - object_to.rect.centerx)
   dy = float(self.rect.centery - object_to.rect.centery)
   rads = math.atan2(-dy,dx)
-  #print np.rad2deg(rads)
+  rads = rads % np.pi
+  #print rads
   return rads
 
  def distance_between(self, object_to):
@@ -123,21 +139,15 @@ class Mosquitoe(pygame.sprite.Sprite):
   z = np.sqrt(np.power(dx,2) + np.power(dy,2))
   return z
 
- def distance_between_food(self, list_of_food, number_of_input):
+ def distance_between_food(self, list_of_food):
   "Reset Input Layer"
   self.input.fill(MAX_DISTANCE)
   for f in list_of_food:
    rads = self.angle_between(f)
    temp_distance = self.distance_between(f)
-   if number_of_input == 1:
-       if temp_distance < self.input[0]:
-        self.input[0] = temp_distance
-        self.input[1] = rads
-   elif number_of_input == 2:
-       if temp_distance < self.input[2] and temp_distance > self.input[0]:
-        self.input[2] = temp_distance
-        self.input[3] = rads
-
+   if temp_distance < self.input[0]:
+     self.input[0] = temp_distance
+     self.input[1] = rads
 
 "Screen"
 pygame.init()
@@ -153,7 +163,7 @@ moscos = []
 comidas =[]
 
 for i in range(N_NUMBER_M):
-    moscos.append(Mosquitoe((r.randint(1,360), r.randint(2,3)), (r.randint(0,639), r.randint(0,476)), population[i]))
+    moscos.append(Mosquitoe((r.randint(0,1), r.randint(0,1)), (r.randint(0,WIDTH-1), r.randint(0,HEIGHT-1)), population[i]))
 
 #comida = Food((619, 459))
 posx = r.randint(1,619)
@@ -188,8 +198,7 @@ while True:
     comidas.append(comida)
     cambiar = False
 
-  mosco.distance_between_food(comidas, 1)
-  mosco.distance_between_food(comidas, 2)
+  mosco.distance_between_food(comidas)
   mosco.update()
   mosco.draw(screen)
   comida.draw(screen)
