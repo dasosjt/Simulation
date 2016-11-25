@@ -16,12 +16,16 @@ idMayor = 0
 
 INFINITE = float("inf")
 
-DP = 10
+DP = 15
 
-N_NUMBER_M = 100
-N_NUMBER_C = 10
+N_NUMBER_M = 75
+N_NUMBER_C = 15
 
-CLK = 500
+CLK = 100
+
+T = 1000
+
+mean = 0
 
 population = np.random.randint(-100,100,(N_NUMBER_M, NODES*NODES))
 population = np.multiply(population, 0.01)
@@ -33,37 +37,83 @@ def terminar(moscos):
     if mosco.fitness > mayor:
       mayor = mosco.fitness
       idMayor = moscos.index(mosco)
-  print "El fitness mayor es " + str(mayor) + " del mosco " + str(idMayor)
+  #print "El fitness mayor es " + str(mayor) + " del mosco " + str(idMayor)
 
 def nuevaPoblacion(moscos):
-
   mayor = 0
   mean = 0
   for mosco in moscos:
-    mean +=mosco.fitness
+    mean += mosco.fitness
     if mosco.fitness > mayor:
       mayor = mosco.fitness
-      idMayor = moscos.index(mosco)
   mean = mean/100.
-  
+
   buenosMoscos = []
   for mosco in moscos:
     if mosco.fitness > mean:
       buenosMoscos.append(mosco)
-  print len(buenosMoscos)
+  l = len(buenosMoscos)
 
-  
-  
-      
   moscos = []
-  
+
   for i in range(N_NUMBER_M):
-    a = r.randint(0,len(buenosMoscos)-1)  
-    temp = buenosMoscos[a]
-    moscos.append(Mosquitoe((r.randint(0,1), r.randint(0,1)), (r.randint(0,WIDTH-1), r.randint(0,HEIGHT-1)), temp.gann))
-    
-  return moscos
-    
+    a = r.randint(0,len(buenosMoscos)-1)
+    temp_mosco = buenosMoscos[a]
+
+    p_mutacion = 0.3
+    p_crossover = 0.5
+    p_random = 0.05
+
+    new_gann = np.random.randint(-100,100,(1, NODES*NODES))
+    new_gann = np.multiply(new_gann, 0.01)
+    RGB = (20, 255, 20)
+    if(p_random < r.uniform(0,1)):
+     if(p_crossover < r.uniform(0,1)):
+      a = r.randint(0,len(buenosMoscos)-1)
+      temp_mosco2 = buenosMoscos[a]
+      a = r.randint(0,len(buenosMoscos)-1)
+      temp_mosco3 = buenosMoscos[a]
+      if(p_mutacion < r.uniform(0,1)):
+        #print "MUTACION"
+        RGB = (20, 100, 100)
+        new_gann = np.zeros((NODES,NODES))
+        for i in range(INPUT-1):
+         for j in range(INPUT-1):
+          if(r.randint(0,1)==1):
+             new_gann[i,j] = temp_mosco.gann[i,j] - r.uniform(0, 0.5)
+          else:
+             new_gann[i,j] = temp_mosco.gann[i,j] + r.uniform(0, 0.5)
+        for i in range(SIGMOID-1):
+         for j in range(SIGMOID-1):
+          if(r.randint(0,2)==1):
+             new_gann[INPUT+i,INPUT+j] = temp_mosco2.gann[INPUT+i,INPUT+j] -r.uniform(0, 0.15)
+          elif(r.randint(0,2)==1):
+             new_gann[INPUT+i,INPUT+j] = temp_mosco2.gann[INPUT+i,INPUT+j] + r.uniform(0, 0.15)
+          else:
+             new_gann[INPUT+i,INPUT+j] = temp_mosco2.gann[INPUT+i,INPUT+j]
+        for i in range(OUTPUT-1):
+         for j in range(OUTPUT-1):
+          new_gann[INPUT+SIGMOID+i,INPUT+SIGMOID+j] = temp_mosco3.gann[INPUT+SIGMOID+i,INPUT+SIGMOID+j]
+      else:
+        #print "CROSS_OVER"
+        RGB = (100, 80, 15)
+        new_gann = np.zeros((NODES,NODES))
+        for i in range(INPUT-1):
+         for j in range(INPUT-1):
+          new_gann[i,j] = temp_mosco.gann[i,j]
+        for i in range(SIGMOID-1):
+         for j in range(SIGMOID-1):
+          new_gann[INPUT+i,INPUT+j] = temp_mosco2.gann[INPUT+i,INPUT+j]
+        for i in range(OUTPUT-1):
+         for j in range(OUTPUT-1):
+          new_gann[INPUT+SIGMOID+i,INPUT+SIGMOID+j] = temp_mosco3.gann[INPUT+SIGMOID+i,INPUT+SIGMOID+j]
+     else:
+      "BEST"
+      RGB = (0, 0, 0)
+      new_gann = temp_mosco.gann
+    moscos.append(Mosquitoe((r.randint(0,1), r.randint(0,1)), (r.randint(0,WIDTH-1), r.randint(0,HEIGHT-1)), new_gann, RGB))
+  return moscos,mean,l
+
 def sigmoid(number):
   result = 1/(1 + np.exp(-number))
   return result
@@ -88,11 +138,12 @@ class Mosquitoe(pygame.sprite.Sprite):
  "Function: update, new_pos"
  "Atributes: vector"
 
- def __init__(self, vector, position, gann):
+ def __init__(self, vector, position, gann, RGB):
   pygame.sprite.Sprite.__init__(self)
   self.image = pygame.Surface((10, 10))
   self.image = self.image.convert()
-  self.image.fill((20,20,20))
+  self.RGB = RGB
+  self.image.fill(self.RGB)
   self.rect = self.image.get_rect()
   self.rect.x, self.rect.y  = position
   self.vector = vector
@@ -158,7 +209,10 @@ class Mosquitoe(pygame.sprite.Sprite):
 
  def draw(self, surface):
   #surface.blit(self.image, (self.rect.x, self.rect.y))
-  pygame.draw.circle(surface, (20,150,20), (self.rect.x, self.rect.y), 3*self.fitness)
+  if(3*self.fitness < 30):
+      pygame.draw.circle(surface, self.RGB, (self.rect.x, self.rect.y), 3*self.fitness)
+  else:
+      pygame.draw.circle(surface, self.RGB, (self.rect.x, self.rect.y), 30)
 
  def angle_between(self, object_to):
   dx = float(self.rect.centerx - object_to.rect.centerx)
@@ -194,7 +248,7 @@ class Mosquitoe(pygame.sprite.Sprite):
 Generacion = 0
 
 while Generacion < 11:
- 
+
  "Screen"
  pygame.init()
  screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -208,15 +262,15 @@ while Generacion < 11:
  if Generacion == 0:
   moscos = []
   comidas = []
-
   for i in range(N_NUMBER_M):
-     moscos.append(Mosquitoe((r.randint(0,1), r.randint(0,1)), (r.randint(0,WIDTH-1), r.randint(0,HEIGHT-1)), population[i]))
+     moscos.append(Mosquitoe((r.randint(0,1), r.randint(0,1)), (r.randint(0,WIDTH-1), r.randint(0,HEIGHT-1)), population[i], (20, 255, 20)))
 
   for i in range(N_NUMBER_C):
      comidas.append(Food((r.randint(1,WIDTH-1), r.randint(1,HEIGHT-1))))
-    
+
  else:
-  moscos = nuevaPoblacion(moscos)
+  mean=0
+  moscos,mean,l = nuevaPoblacion(moscos)
   comidas = []
 
   for i in range(N_NUMBER_C):
@@ -227,7 +281,7 @@ while Generacion < 11:
  clock = pygame.time.Clock()
  t = 1
  while True:
-  if(t==1000):
+  if(t==T):
     Generacion += 1
     terminar(moscos)
     break
@@ -255,12 +309,14 @@ while Generacion < 11:
   myfont = pygame.font.SysFont("calibri", 25)
   label = myfont.render("GENERATION : "+str(Generacion+1), 24, (0,0,0))
   label2 = myfont.render("t : "+str(t), 24, (0,0,0))
+  label3 = myfont.render("Mean of food eaten by each Mosquitoe: "+str(mean), 24, (0,0,0))
+  label4 = myfont.render("Length of Mosquitoes that ate over the mean : "+str(mean), 24, (0,0,0))
   screen.blit(label, (WIDTH/2 - 75, 40))
-  screen.blit(label2, (10, 20))
-  
+  screen.blit(label2, (10, HEIGHT-80))
+  screen.blit(label3, (10, HEIGHT-60))
+  screen.blit(label4, (10, HEIGHT-40))
+
   "60 fps"
   clock.tick(CLK)
   pygame.display.update()
   t += 1
-
- 
