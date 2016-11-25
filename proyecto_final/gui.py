@@ -21,7 +21,7 @@ DP = 15
 N_NUMBER_M = 75
 N_NUMBER_C = 15
 
-CLK = 100
+CLK = 1000
 
 T = 1000
 
@@ -54,6 +54,9 @@ def nuevaPoblacion(moscos):
       buenosMoscos.append(mosco)
   l = len(buenosMoscos)
 
+  print "Media " + str(mean)
+  print "L " + str(l)
+
   moscos = []
 
   for i in range(N_NUMBER_M):
@@ -75,7 +78,6 @@ def nuevaPoblacion(moscos):
       temp_mosco3 = buenosMoscos[a]
       if(p_mutacion < r.uniform(0,1)):
         #print "MUTACION"
-        RGB = (20, 100, 100)
         new_gann = np.zeros((NODES,NODES))
         for i in range(INPUT-1):
          for j in range(INPUT-1):
@@ -94,9 +96,9 @@ def nuevaPoblacion(moscos):
         for i in range(OUTPUT-1):
          for j in range(OUTPUT-1):
           new_gann[INPUT+SIGMOID+i,INPUT+SIGMOID+j] = temp_mosco3.gann[INPUT+SIGMOID+i,INPUT+SIGMOID+j]
+        new_gann = new_gann.reshape((1, NODES*NODES))
       else:
         #print "CROSS_OVER"
-        RGB = (100, 80, 15)
         new_gann = np.zeros((NODES,NODES))
         for i in range(INPUT-1):
          for j in range(INPUT-1):
@@ -107,6 +109,7 @@ def nuevaPoblacion(moscos):
         for i in range(OUTPUT-1):
          for j in range(OUTPUT-1):
           new_gann[INPUT+SIGMOID+i,INPUT+SIGMOID+j] = temp_mosco3.gann[INPUT+SIGMOID+i,INPUT+SIGMOID+j]
+        new_gann = new_gann.reshape((1, NODES*NODES))
      else:
       "BEST"
       RGB = (0, 0, 0)
@@ -184,13 +187,16 @@ class Mosquitoe(pygame.sprite.Sprite):
   #print temp_output
   (angle, z) = self.vector
   self.vector = ((temp_output[0] - temp_output[1])*2*np.pi, (temp_output[2] - temp_output[3])*DP)
-  self.rect = self.new_pos(self.rect, self.vector)
+  try:
+    self.rect = self.new_pos(self.rect, self.vector)
+  except:
+    self.rect = self.rect.move(0,0)
 
  def new_pos(self, rect, vector):
   "Vector with the direction and how much to move"
   (angle, z) = vector
   #print np.rad2deg(angle)
-  (dx,dy) = (z*np.cos(angle), -z*np.sin(angle))
+  (dx, dy) = (z*np.cos(angle), -z*np.sin(angle))
   #print (dx, dy)
   if not((rect.centerx>0 and rect.centerx<WIDTH) and (rect.centery>0 and rect.centery<HEIGHT)):
     if (rect.centerx < 0):
@@ -205,7 +211,7 @@ class Mosquitoe(pygame.sprite.Sprite):
     elif(rect.centery > HEIGHT):
         #print "++y"
         rect.centery = 1
-  return rect.move(dx,dy)
+  return rect.move(dx, dy)
 
  def draw(self, surface):
   #surface.blit(self.image, (self.rect.x, self.rect.y))
@@ -246,8 +252,8 @@ class Mosquitoe(pygame.sprite.Sprite):
   self.rect.y = r.randint(0,HEIGHT-1)
 
 Generacion = 0
-
-while Generacion < 11:
+l = 0
+while Generacion < 200:
 
  "Screen"
  pygame.init()
@@ -310,7 +316,7 @@ while Generacion < 11:
   label = myfont.render("GENERATION : "+str(Generacion+1), 24, (0,0,0))
   label2 = myfont.render("t : "+str(t), 24, (0,0,0))
   label3 = myfont.render("Mean of food eaten by each Mosquitoe: "+str(mean), 24, (0,0,0))
-  label4 = myfont.render("Length of Mosquitoes that ate over the mean : "+str(mean), 24, (0,0,0))
+  label4 = myfont.render("Length of Mosquitoes that ate over the mean : "+str(l), 24, (0,0,0))
   screen.blit(label, (WIDTH/2 - 75, 40))
   screen.blit(label2, (10, HEIGHT-80))
   screen.blit(label3, (10, HEIGHT-60))
